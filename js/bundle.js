@@ -178,6 +178,7 @@ const ptBR = {
     proj3Desc: 'Uma coleção de projetos de design de sites, branding e conteúdo digital entregues a clientes em múltiplos setores.',
     proj4Desc: 'Painel de analytics em tempo real com gráficos interativos e visualização de dados.',
     proj5Desc: 'Interface de chat inteligente com processamento de linguagem natural e aprendizado de máquina.',
+    proj6Desc: 'Sem licença SPA/MF não pode operar de verdade no Brasil. Isso é só uma demonstração de skill em desenvolvimento web + lógica de jogos.',
     privateLinkMessage: 'O dono pediu para não divulgar',
   },
   visitors: {
@@ -273,6 +274,7 @@ const en = {
     proj3Desc: 'A collection of website design, branding, and digital content projects delivered to clients across multiple industries.',
     proj4Desc: 'Real-time analytics dashboard with interactive charts and data visualization.',
     proj5Desc: 'Intelligent chat interface with natural language processing and machine learning.',
+    proj6Desc: 'Without SPA/MF license it cannot operate for real in Brazil. This is just a demonstration of web development skill + game logic.',
     privateLinkMessage: 'The owner asked not to disclose',
   },
   visitors: {
@@ -346,6 +348,7 @@ const es = {
     proj3Desc: 'Una colección de proyectos de diseño de sitios, branding y contenido digital entregados a clientes en múltiples sectores.',
     proj4Desc: 'Panel de analytics en tiempo real con gráficos interactivos y visualización de datos.',
     proj5Desc: 'Interfaz de chat inteligente con procesamiento de lenguaje natural y aprendizaje automático.',
+    proj6Desc: 'Sin licencia SPA/MF no puede operar realmente en Brasil. Esto es solo una demostración de habilidad en desarrollo web + lógica de juegos.',
     privateLinkMessage: 'El propietario pidió no divulgar',
   },
   visitors: {
@@ -419,6 +422,7 @@ const zhCN = {
     proj3Desc: '为多个行业的客户提供的网站设计、品牌塑造和数字内容项目集合。',
     proj4Desc: '实时分析仪表盘,配备交互式图表和数据可视化。',
     proj5Desc: '智能聊天界面,具备自然语言处理和机器学习能力。',
+    proj6Desc: '没有SPA/MF许可证,无法在巴西真正运营。这仅是网页开发技能+游戏逻辑的演示。',
     privateLinkMessage: '业主要求不公开',
   },
   visitors: {
@@ -492,6 +496,7 @@ const zhTW = {
     proj3Desc: '為多個行業的客戶提供的網站設計、品牌塑造和數位內容專案集合。',
     proj4Desc: '即時分析儀表板,配備互動式圖表和資料視覺化。',
     proj5Desc: '智慧聊天介面,具備自然語言處理和機器學習能力。',
+    proj6Desc: '沒有SPA/MF許可證,無法在巴西真正運營。這僅是網頁開發技能+遊戲邏輯的演示。',
     privateLinkMessage: '業主要求不公開',
   },
   visitors: {
@@ -565,6 +570,7 @@ const ja = {
     proj3Desc: '複数の業界のクライアントに提供したウェブサイトデザイン、ブランディング、デジタルコンテンツプロジェクトのコレクション。',
     proj4Desc: 'インタラクティブなチャートとデータ可視化を備えたリアルタイム分析ダッシュボード。',
     proj5Desc: '自然言語処理と機械学習を備えたインテリジェントなチャットインターフェース。',
+    proj6Desc: 'SPA/MFライセンスなしではブラジルで実際に運営できません。これはウェブ開発スキル＋ゲームロジックのデモンストレーションです。',
     privateLinkMessage: 'オーナー非公開希望',
   },
   visitors: {
@@ -2959,6 +2965,17 @@ const projects = [
     linkType: 'view',
     github: '#',
   },
+  {
+    id: 6,
+    title: 'Roleta',
+    period: '',
+    descKey: 'proj6Desc',
+    tags: ['Slot Machine', 'JavaScript', 'PAR Sheet', 'House Edge'],
+    image: 'img/roleta.webp',
+    gradient: '',
+    link: '#roleta',
+    linkType: 'view',
+  },
 ];
 
 const testimonials = [
@@ -2981,6 +2998,7 @@ const testimonials = [
 function ProjectsSection() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [privateMsgFor, setPrivateMsgFor] = useState(null);
+  const [showRoletaModal, setShowRoletaModal] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -3005,6 +3023,11 @@ function ProjectsSection() {
       setPrivateMsgFor(true);
       return;
     }
+    if (link === '#roleta') {
+      // Projeto Roleta -> abre modal especial com iframe
+      setShowRoletaModal(true);
+      return;
+    }
     if (link.startsWith('http://') || link.startsWith('https://')) {
       // Link externo -> nova aba
       window.open(link, '_blank', 'noopener,noreferrer');
@@ -3022,6 +3045,7 @@ function ProjectsSection() {
   };
 
   const closePrivateMsg = () => setPrivateMsgFor(null);
+  const closeRoletaModal = () => setShowRoletaModal(false);
 
   return (
     <section
@@ -3198,6 +3222,47 @@ function ProjectsSection() {
             >
               OK
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Projeto Roleta (altura aumentada +300px vertical) */}
+      {showRoletaModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer p-4"
+          onClick={closeRoletaModal}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="bg-[#0b0f19] border-2 border-[#00d9ff]/50 rounded-xl overflow-hidden shadow-2xl cursor-default flex flex-col"
+            style={{ width: 'min(90vw, 50vw)', height: 'min(90vh, calc(50vh + 300px))' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 bg-[#1a1f3a]/80 border-b border-[#00d9ff]/30 shrink-0">
+              <h3 className="text-lg font-bold text-[#00ff88] tracking-wider">
+                🎰 Roleta — Cyber Neon Slots
+              </h3>
+              <button
+                type="button"
+                onClick={closeRoletaModal}
+                className="text-gray-400 hover:text-white text-2xl leading-none cursor-pointer bg-transparent border-none hover:rotate-90 transition-transform duration-200"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            {/* Iframe */}
+            <div className="flex-1 relative overflow-hidden">
+              <iframe
+                src="portfolio/roletasBET/index.html"
+                title="Roleta Cyber Neon Slots"
+                className="absolute inset-0 w-full h-full border-0"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
+              />
+            </div>
           </div>
         </div>
       )}

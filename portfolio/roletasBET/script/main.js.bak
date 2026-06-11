@@ -1,0 +1,470 @@
+// Game Constants & State
+        const INITIAL_BALANCE = 100000;
+        let currentBalance = 0;
+        let isSpinning = false;
+        let isSpinningG2 = false;
+
+        const symbolsConfig = [
+            { char: '<img src="img/diamante_roleta1.webp" alt="💎" class="slot-icon">', mult: 50 },
+            { char: '<img src="img/lobo_roleta1.webp" alt="🐺" class="slot-icon">', mult: 25 },
+            { char: '<img src="img/trevo_roleta1.webp" alt="🍀" class="slot-icon">', mult: 10 },
+            { char: '<img src="img/saco_dinheiro_roleta1.webp" alt="💰" class="slot-icon">', mult: 5 },
+            { char: '<img src="img/gato_roleta1.webp" alt="🐱" class="slot-icon">', mult: 3 },
+            { char: '<img src="img/carne_roleta1.webp" alt="🥩" class="slot-icon">', mult: 1.5 }
+        ];
+
+        const symbolsConfigG2 = [
+            { char: '<img src="img/diamante_roleta2.webp" alt="💎" class="slot-icon">', mult: 100 },
+            { char: '<img src="img/sete_roleta2.webp" alt="7️⃣" class="slot-icon">', mult: 50 },
+            { char: '<img src="img/melancia_roleta2.webp" alt="🍉" class="slot-icon">', mult: 20 },
+            { char: '<img src="img/bar_roleta2.webp" alt="🎰" class="slot-icon">', mult: 10 },
+            { char: '<img src="img/limao_roleta2.webp" alt="🍋" class="slot-icon">', mult: 5 },
+            { char: '<img src="img/cereja_roleta2.webp" alt="🍒" class="slot-icon">', mult: 2 }
+        ];
+
+        // 8 Paylines mapping (0-8 indices)
+        const paylines = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6]             // Diagonals
+        ];
+
+        // DOM Elements
+        const loginModal = document.getElementById('login-modal');
+        const loginBtn = document.getElementById('login-btn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('login-error');
+        const mainWrapper = document.getElementById('main-wrapper');
+        const balanceDisplays = document.querySelectorAll('.balance-display');
+        
+        // Game 1 Elements
+        const spinBtn = document.getElementById('spin-btn');
+        const winOverlay = document.getElementById('win-overlay');
+        const betInput = document.getElementById('bet-input');
+        const cells = Array.from({length: 9}, (_, i) => document.getElementById(`cell-${i}`));
+
+        // Game 2 Elements
+        const spinBtnG2 = document.getElementById('g2-spin-btn');
+        const winOverlayG2 = document.getElementById('g2-win-overlay');
+        const betInputG2 = document.getElementById('g2-bet-input');
+        const cellsG2 = Array.from({length: 9}, (_, i) => document.getElementById(`g2-cell-${i}`));
+
+        function getBetAmount() {
+            let val = parseInt(betInput.value, 10);
+            if (isNaN(val) || val <= 0) val = 0;
+            return val;
+        }
+
+        function getBetAmountG2() {
+            let val = parseInt(betInputG2.value, 10);
+            if (isNaN(val) || val <= 0) val = 0;
+            return val;
+        }
+
+        betInput.addEventListener('input', updateBalanceDisplay);
+        betInputG2.addEventListener('input', updateBalanceDisplay);
+
+        // --- LOGIN LOGIC ---
+        function attemptLogin() {
+            if (usernameInput.value === '1' && passwordInput.value === '1') {
+                loginError.innerText = '';
+                loginModal.style.opacity = '0';
+                loginModal.style.visibility = 'hidden';
+                setTimeout(() => {
+                    mainWrapper.classList.add('active');
+                    currentBalance = INITIAL_BALANCE;
+                    updateBalanceDisplay();
+                }, 300);
+            } else {
+                loginError.innerText = 'Credenciais inválidas. Acesso negado.';
+                // Shake effect
+                document.querySelector('.login-box').style.transform = 'translateX(10px)';
+                setTimeout(() => document.querySelector('.login-box').style.transform = 'translateX(-10px)', 100);
+                setTimeout(() => document.querySelector('.login-box').style.transform = 'translateX(0)', 200);
+            }
+        }
+
+        loginBtn.addEventListener('click', attemptLogin);
+        passwordInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
+        usernameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
+
+        // --- UTILS ---
+        function updatePaytableDisplay(bet) {
+            symbolsConfig.forEach(sym => {
+                const prizeElement = document.getElementById(`prize-${sym.mult}`);
+                if (prizeElement) {
+                    prizeElement.innerText = (sym.mult * bet).toLocaleString('en-US');
+                }
+            });
+        }
+
+        function updatePaytableDisplayG2(bet) {
+            symbolsConfigG2.forEach(sym => {
+                const prizeElement = document.getElementById(`g2-prize-${sym.mult}`);
+                if (prizeElement) {
+                    prizeElement.innerText = (sym.mult * bet).toLocaleString('en-US');
+                }
+            });
+        }
+
+        function updateBalanceDisplay() {
+            balanceDisplays.forEach(el => el.innerText = currentBalance.toLocaleString('en-US'));
+            
+            // Update Game 1 limits
+            const currentBet = getBetAmount();
+            updatePaytableDisplay(currentBet);
+            if (currentBalance < currentBet || currentBet <= 0 || isSpinning) {
+                spinBtn.disabled = true;
+                spinBtn.style.opacity = '0.5';
+            } else {
+                spinBtn.disabled = false;
+                spinBtn.style.opacity = '1';
+            }
+
+            // Update Game 2 limits
+            const currentBet2 = getBetAmountG2();
+            updatePaytableDisplayG2(currentBet2);
+            if (currentBalance < currentBet2 || currentBet2 <= 0 || isSpinningG2) {
+                spinBtnG2.disabled = true;
+                spinBtnG2.style.opacity = '0.5';
+            } else {
+                spinBtnG2.disabled = false;
+                spinBtnG2.style.opacity = '1';
+            }
+        }
+
+        function formatCurrency(val) {
+            return val.toLocaleString('pt-BR');
+        }
+
+        // --- GAME ENGINE LOGIC ---
+        
+        function evaluateGrid(grid) {
+            let wonLines = [];
+            let totalMult = 0;
+
+            paylines.forEach(line => {
+                const [a, b, c] = line;
+                if (grid[a] === grid[b] && grid[b] === grid[c]) {
+                    wonLines.push(line);
+                    const symConf = symbolsConfig.find(s => s.char === grid[a]);
+                    totalMult += symConf.mult;
+                }
+            });
+
+            const isFullHouse = grid.every(val => val === grid[0]);
+            if (isFullHouse) {
+                // Multiplicador de +25% sobre a soma das 8 linhas para atingir exatos 500x no prêmio máximo (50*8*1.25 = 500)
+                totalMult *= 1.25; 
+            }
+
+            return { wonLines, totalMult, isFullHouse };
+        }
+
+        function getRandomSymbol() {
+            return symbolsConfig[Math.floor(Math.random() * symbolsConfig.length)].char;
+        }
+
+        // Sorteio Prévio Generator
+        function generateDeterminedGrid(category) {
+            let grid = new Array(9).fill('');
+            const symChars = symbolsConfig.map(s => s.char);
+
+            if (category === 'full') {
+                const sym = getRandomSymbol();
+                return new Array(9).fill(sym);
+            }
+
+            // Attempt to build grid that satisfies the category rules safely
+            for (let attempts = 0; attempts < 300; attempts++) {
+                let temp = [...grid];
+
+                if (category === 'lose') {
+                    // 40% near miss logic
+                    if (Math.random() < 0.4) {
+                        const line = paylines[Math.floor(Math.random() * paylines.length)];
+                        const symIdx = Math.floor(Math.random() * symbolsConfig.length);
+                        const diffIdx = (symIdx + 1) % symbolsConfig.length;
+                        temp[line[0]] = symbolsConfig[symIdx].char;
+                        temp[line[1]] = symbolsConfig[symIdx].char;
+                        temp[line[2]] = symbolsConfig[diffIdx].char;
+                    }
+                    // Fill remaining
+                    for (let i = 0; i < 9; i++) if (!temp[i]) temp[i] = getRandomSymbol();
+                    
+                    if (evaluateGrid(temp).wonLines.length === 0) return temp;
+                } 
+                else if (category === 'common') {
+                    // 1-2 lines of common symbols (indices 2 to 5)
+                    const commonSyms = symbolsConfig.slice(2);
+                    const sym = commonSyms[Math.floor(Math.random() * commonSyms.length)].char;
+                    const line = paylines[Math.floor(Math.random() * paylines.length)];
+                    line.forEach(idx => temp[idx] = sym);
+                    
+                    for (let i = 0; i < 9; i++) if (!temp[i]) temp[i] = getRandomSymbol();
+                    
+                    const res = evaluateGrid(temp);
+                    if (res.wonLines.length >= 1 && res.wonLines.length <= 2 && !res.isFullHouse) {
+                        const highSymsChars = symbolsConfig.slice(0, 2).map(s => s.char);
+                        const hasHigh = res.wonLines.some(l => highSymsChars.includes(temp[l[0]]));
+                        if (!hasHigh) return temp;
+                    }
+                }
+                else if (category === 'high') {
+                    // High value symbols (indices 0, 1)
+                    const highSyms = symbolsConfig.slice(0, 2);
+                    const sym = highSyms[Math.floor(Math.random() * highSyms.length)].char;
+                    const line = paylines[Math.floor(Math.random() * paylines.length)];
+                    line.forEach(idx => temp[idx] = sym);
+
+                    for (let i = 0; i < 9; i++) if (!temp[i]) temp[i] = getRandomSymbol();
+                    
+                    const res = evaluateGrid(temp);
+                    if (res.wonLines.length >= 1 && !res.isFullHouse) return temp;
+                }
+            }
+
+            // Failsafe fallbacks (using actual HTML symbol strings)
+            if (category === 'lose') return [symChars[0], symChars[1], symChars[2], symChars[3], symChars[4], symChars[5], symChars[0], symChars[1], symChars[2]];
+            if (category === 'common') return [symChars[2], symChars[2], symChars[2], symChars[0], symChars[1], symChars[3], symChars[4], symChars[5], symChars[0]];
+            if (category === 'high') return [symChars[0], symChars[0], symChars[0], symChars[1], symChars[2], symChars[3], symChars[4], symChars[5], symChars[1]];
+            return new Array(9).fill(symChars[5]);
+        }
+
+        // --- SPIN ACTION ---
+        spinBtn.addEventListener('click', () => {
+            const currentBet = getBetAmount();
+            if (isSpinning || currentBalance < currentBet || currentBet <= 0) return;
+
+            // 1. Deduct Bet
+            currentBalance -= currentBet;
+            updateBalanceDisplay();
+            isSpinning = true;
+            betInput.disabled = true;
+
+            // 2. Clear UI states
+            winOverlay.classList.remove('show');
+            cells.forEach(c => {
+                c.classList.remove('win-pulse');
+            });
+
+            // 3. Determine Category (Sorteio)
+            const r = Math.random() * 100;
+            let category = 'lose';
+            if (r < 65) category = 'lose';
+            else if (r < 90) category = 'common'; // 25%
+            else if (r < 98) category = 'high';   // 8%
+            else category = 'full';               // 2%
+
+            const finalGrid = generateDeterminedGrid(category);
+
+            // 4. Visual Animation (Cassino Reel Spin)
+            cells.forEach((c, idx) => {
+                let stripHTML = `<div class="reel-strip">`;
+                stripHTML += `<div>${finalGrid[idx]}</div>`; // Final symbol
+                for(let i=0; i<25; i++) {
+                    stripHTML += `<div>${getRandomSymbol()}</div>`;
+                }
+                stripHTML += `</div>`;
+                c.innerHTML = stripHTML;
+                
+                let strip = c.querySelector('.reel-strip');
+                strip.style.transform = `translateY(-${25 * 110}px)`;
+                strip.style.transition = 'none';
+                
+                void strip.offsetWidth; // Force reflow
+                
+                c.classList.add('cell-blur');
+                
+                let col = idx % 3;
+                let duration = 1.0 + (col * 0.5); // Stagger columns: 1s, 1.5s, 2s
+                
+                strip.style.transition = `transform ${duration}s cubic-bezier(0.15, 1.1, 0.2, 1)`;
+                strip.style.transform = `translateY(0)`;
+                
+                setTimeout(() => {
+                    c.classList.remove('cell-blur');
+                }, duration * 1000 - 200);
+            });
+
+            // 5. Stop Animation & Evaluate
+            setTimeout(() => {
+                const winInfo = evaluateGrid(finalGrid);
+
+                if (winInfo.wonLines.length > 0) {
+                    let rawPrize = winInfo.totalMult * currentBet;
+                    let prize = rawPrize;
+                    let isBrokenNumber = prize % 1 !== 0;
+                    let bonusValue = 0;
+                    
+                    if (isBrokenNumber) {
+                        prize = Math.ceil(rawPrize);
+                        bonusValue = prize - rawPrize;
+                    }
+
+                    currentBalance += prize;
+                    
+                    // Highlight logic
+                    let winningIndices = new Set();
+                    if (winInfo.isFullHouse) {
+                        for(let i=0; i<9; i++) winningIndices.add(i);
+                        winOverlay.innerHTML = `🌟 FULL HOUSE! 🌟<br>GANHOU ${formatCurrency(prize)}`;
+                    } else {
+                        winInfo.wonLines.forEach(l => l.forEach(idx => winningIndices.add(idx)));
+                        winOverlay.innerHTML = `GANHOU ${formatCurrency(prize)}!`;
+                    }
+                    
+                    if (isBrokenNumber) {
+                        winOverlay.innerHTML += `<br><span style="font-size: 1.2rem; color: #00d2ff; text-shadow: 0 0 10px #00d2ff;">+ Bônus de ${bonusValue.toLocaleString('en-US')}!</span>`;
+                    }
+
+                    winningIndices.forEach(idx => cells[idx].classList.add('win-pulse'));
+                    
+                    // Show message & update balance slightly after to build tension
+                    setTimeout(() => {
+                        winOverlay.classList.add('show');
+                        updateBalanceDisplay();
+                    }, 200);
+
+                } else {
+                    updateBalanceDisplay();
+                }
+
+                isSpinning = false;
+                betInput.disabled = false;
+                updateBalanceDisplay();
+            }, 2100);
+        });
+
+        // ============================================
+        // GAME 2 LOGIC (SINGLE PAYLINE)
+        // ============================================
+
+        function getRandomSymbolG2() {
+            return symbolsConfigG2[Math.floor(Math.random() * symbolsConfigG2.length)].char;
+        }
+
+        function generateDeterminedGridG2(category) {
+            let grid = new Array(9).fill('');
+            for(let i=0; i<9; i++) {
+                grid[i] = getRandomSymbolG2();
+            }
+            
+            let centerSym = '';
+
+            if (category === 'lose') {
+                // Ensure center line is NOT 3 of a kind
+                while(grid[3] === grid[4] && grid[4] === grid[5]) {
+                    grid[5] = getRandomSymbolG2();
+                }
+                return grid;
+            } else if (category === 'basic') {
+                centerSym = Math.random() < 0.5 ? '<img src="img/cereja_roleta2.webp" alt="🍒" class="slot-icon">' : '<img src="img/limao_roleta2.webp" alt="🍋" class="slot-icon">';
+            } else if (category === 'medium') {
+                centerSym = Math.random() < 0.5 ? '<img src="img/melancia_roleta2.webp" alt="🍉" class="slot-icon">' : '<img src="img/bar_roleta2.webp" alt="🎰" class="slot-icon">';
+            } else if (category === 'high') {
+                centerSym = '<img src="img/sete_roleta2.webp" alt="7️⃣" class="slot-icon">';
+            } else if (category === 'jackpot') {
+                centerSym = '<img src="img/diamante_roleta2.webp" alt="💎" class="slot-icon">';
+            }
+
+            // Apply win to center line
+            grid[3] = centerSym;
+            grid[4] = centerSym;
+            grid[5] = centerSym;
+
+            return grid;
+        }
+
+        spinBtnG2.addEventListener('click', () => {
+            const currentBet = getBetAmountG2();
+            if (isSpinningG2 || currentBalance < currentBet || currentBet <= 0) return;
+
+            currentBalance -= currentBet;
+            updateBalanceDisplay();
+            isSpinningG2 = true;
+            betInputG2.disabled = true;
+
+            winOverlayG2.classList.remove('show');
+            cellsG2.forEach(c => c.classList.remove('win-pulse'));
+
+            // Sorteio Single Payline
+            const r = Math.random() * 100;
+            let category = 'lose';
+            if (r < 60) category = 'lose';
+            else if (r < 80) category = 'basic';   // +20%
+            else if (r < 93) category = 'medium';  // +13%
+            else if (r < 99) category = 'high';    // +6%
+            else category = 'jackpot';             // +1%
+
+            const finalGrid = generateDeterminedGridG2(category);
+
+            // Reel Animation
+            cellsG2.forEach((c, idx) => {
+                let stripHTML = `<div class="reel-strip">`;
+                stripHTML += `<div>${finalGrid[idx]}</div>`;
+                for(let i=0; i<25; i++) {
+                    stripHTML += `<div>${getRandomSymbolG2()}</div>`;
+                }
+                stripHTML += `</div>`;
+                c.innerHTML = stripHTML;
+                
+                let strip = c.querySelector('.reel-strip');
+                strip.style.transform = `translateY(-${25 * 110}px)`;
+                strip.style.transition = 'none';
+                
+                void strip.offsetWidth; // Force reflow
+                
+                c.classList.add('cell-blur');
+                let col = idx % 3;
+                let duration = 1.0 + (col * 0.5); 
+                
+                strip.style.transition = `transform ${duration}s cubic-bezier(0.15, 1.1, 0.2, 1)`;
+                strip.style.transform = `translateY(0)`;
+                
+                setTimeout(() => {
+                    c.classList.remove('cell-blur');
+                }, duration * 1000 - 200);
+            });
+
+            // Evaluation
+            setTimeout(() => {
+                let won = (finalGrid[3] === finalGrid[4] && finalGrid[4] === finalGrid[5]);
+                
+                if (won) {
+                    const symConf = symbolsConfigG2.find(s => s.char === finalGrid[3]);
+                    let rawPrize = symConf.mult * currentBet;
+                    let prize = rawPrize;
+                    let isBrokenNumber = prize % 1 !== 0;
+                    let bonusValue = 0;
+                    
+                    if (isBrokenNumber) {
+                        prize = Math.ceil(rawPrize);
+                        bonusValue = prize - rawPrize;
+                    }
+
+                    currentBalance += prize;
+                    
+                    winOverlayG2.innerHTML = `GANHOU ${formatCurrency(prize)}!`;
+                    if (isBrokenNumber) {
+                        winOverlayG2.innerHTML += `<br><span style="font-size: 1.2rem; color: #00d2ff; text-shadow: 0 0 10px #00d2ff;">+ Bônus de ${bonusValue.toLocaleString('en-US')}!</span>`;
+                    }
+                    
+                    cellsG2[3].classList.add('win-pulse');
+                    cellsG2[4].classList.add('win-pulse');
+                    cellsG2[5].classList.add('win-pulse');
+
+                    setTimeout(() => {
+                        winOverlayG2.classList.add('show');
+                        updateBalanceDisplay();
+                    }, 200);
+                } else {
+                    updateBalanceDisplay();
+                }
+
+                isSpinningG2 = false;
+                betInputG2.disabled = false;
+                updateBalanceDisplay();
+            }, 2100);
+        });

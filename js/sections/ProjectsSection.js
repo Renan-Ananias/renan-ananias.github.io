@@ -66,6 +66,17 @@ const projects = [
     linkType: 'view',
     github: '#',
   },
+  {
+    id: 6,
+    title: 'Roleta',
+    period: '',
+    descKey: 'proj6Desc',
+    tags: ['Slot Machine', 'JavaScript', 'PAR Sheet', 'House Edge'],
+    image: 'img/roleta.webp',
+    gradient: '',
+    link: '#roleta',
+    linkType: 'view',
+  },
 ];
 
 const testimonials = [
@@ -88,6 +99,7 @@ const testimonials = [
 export function ProjectsSection() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [privateMsgFor, setPrivateMsgFor] = useState(null);
+  const [showRoletaModal, setShowRoletaModal] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -112,6 +124,11 @@ export function ProjectsSection() {
       setPrivateMsgFor(true);
       return;
     }
+    if (link === '#roleta') {
+      // Projeto Roleta -> abre modal especial com iframe
+      setShowRoletaModal(true);
+      return;
+    }
     if (link.startsWith('http://') || link.startsWith('https://')) {
       // Link externo -> nova aba
       window.open(link, '_blank', 'noopener,noreferrer');
@@ -129,6 +146,7 @@ export function ProjectsSection() {
   };
 
   const closePrivateMsg = () => setPrivateMsgFor(null);
+  const closeRoletaModal = () => setShowRoletaModal(false);
 
   return (
     <section
@@ -305,6 +323,47 @@ export function ProjectsSection() {
             >
               OK
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Projeto Roleta (altura aumentada +300px vertical) */}
+      {showRoletaModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer p-4"
+          onClick={closeRoletaModal}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="bg-[#0b0f19] border-2 border-[#00d9ff]/50 rounded-xl overflow-hidden shadow-2xl cursor-default flex flex-col"
+            style={{ width: 'min(90vw, 50vw)', height: 'min(90vh, calc(50vh + 300px))' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 bg-[#1a1f3a]/80 border-b border-[#00d9ff]/30 shrink-0">
+              <h3 className="text-lg font-bold text-[#00ff88] tracking-wider">
+                🎰 Roleta — Cyber Neon Slots
+              </h3>
+              <button
+                type="button"
+                onClick={closeRoletaModal}
+                className="text-gray-400 hover:text-white text-2xl leading-none cursor-pointer bg-transparent border-none hover:rotate-90 transition-transform duration-200"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            {/* Iframe */}
+            <div className="flex-1 relative overflow-hidden">
+              <iframe
+                src="portfolio/roletasBET/index.html"
+                title="Roleta Cyber Neon Slots"
+                className="absolute inset-0 w-full h-full border-0"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
+              />
+            </div>
           </div>
         </div>
       )}
