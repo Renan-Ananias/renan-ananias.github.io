@@ -1,0 +1,342 @@
+/* ============================================================
+ * projects.css — Seção Projetos e Testemunhos
+ * ============================================================ */
+
+/* Grid de projetos */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 6rem;
+}
+
+/* Card de projeto */
+.project-card {
+  background: rgba(26, 31, 58, 0.5);
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(30px);
+}
+.project-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out, border-color 0.3s, box-shadow 0.3s;
+}
+.project-card:hover {
+  border-color: rgba(0, 255, 136, 0.6);
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.15);
+}
+
+.project-thumb {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+.project-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+.project-card:hover .project-thumb img { transform: scale(1.1); }
+.project-thumb .gradient-bg {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+}
+.project-thumb .gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 14, 39, 0.8), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.project-card:hover .gradient-overlay { opacity: 1; }
+
+.project-info {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.project-info h3 {
+  color: var(--neon-cyan);
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s;
+}
+.project-card:hover .project-info h3 { color: var(--neon-green); }
+.project-period {
+  color: var(--neon-green);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.project-desc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  flex: 1;
+  line-height: 1.6;
+}
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.project-actions {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 217, 255, 0.2);
+  display: flex;
+  gap: 1.5rem;
+}
+.project-actions button {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--neon-green);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: color 0.2s;
+  cursor: pointer;
+  padding: 0;
+}
+.project-actions button:hover { color: var(--neon-cyan); }
+.project-actions button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Testemunhos */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  background: rgba(26, 31, 58, 0.5);
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  border-radius: 12px;
+  padding: 2rem;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.testimonial-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out, border-color 0.3s, box-shadow 0.3s;
+}
+.testimonial-card:hover {
+  border-color: rgba(0, 255, 136, 0.6);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+}
+.testimonial-stars {
+  color: #facc15;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 2px;
+}
+.testimonial-stars svg { width: 20px; height: 20px; fill: #facc15; }
+.testimonial-card h3 {
+  color: var(--neon-green);
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+.testimonial-card blockquote {
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+.testimonial-card footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 217, 255, 0.2);
+}
+.testimonial-card footer cite {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+.testimonial-card footer .flag { font-size: 1.5rem; }
+
+/* Modal privado */
+.private-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  cursor: pointer;
+}
+.private-modal-box {
+  position: relative;
+  background: var(--bg-card);
+  border: 2px solid var(--neon-cyan);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+.private-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.private-modal-header .icon { font-size: 2rem; }
+.private-modal-header h3 { color: var(--neon-green); font-size: 1.25rem; }
+.private-modal-box p { color: var(--text-secondary); line-height: 1.6; }
+.private-modal-box button.ok {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--neon-green);
+  color: var(--bg-primary);
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.private-modal-box button.ok:hover { opacity: 0.9; }
+
+/* Modal Roleta */
+.roleta-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  cursor: pointer;
+}
+.roleta-modal-box {
+  position: relative;
+  background: #0b0f19;
+  border: 2px solid rgba(0, 217, 255, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  width: min(90vw, 60vw);
+  height: min(90vh, calc(50vh + 300px));
+  /* overflow: hidden removido para não esconder a alça de resize */
+}
+.roleta-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(26, 31, 58, 0.8);
+  border-bottom: 1px solid rgba(0, 217, 255, 0.3);
+  border-radius: 10px 10px 0 0;
+}
+.roleta-modal-header h3 { color: var(--neon-green); font-size: 1.1rem; }
+.roleta-modal-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 10px 10px;
+}
+.roleta-modal-body iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Barra de redimensionamento (Desktop / Tablet / Celular) */
+.resize-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 0.5rem;
+}
+
+.resize-btn {
+  background: rgba(10, 14, 39, 0.4);
+  border: 1px solid rgba(0, 217, 255, 0.2);
+  color: var(--text-secondary);
+  width: 30px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  position: relative;
+}
+.resize-btn:hover {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  background: rgba(0, 255, 136, 0.1);
+}
+.resize-btn.active {
+  border-color: var(--neon-green);
+  color: var(--neon-cyan);
+  background: rgba(0, 217, 255, 0.12);
+  box-shadow: 0 0 8px rgba(0, 217, 255, 0.2);
+}
+
+/* Tooltip no hover */
+.resize-btn-tooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 14, 39, 0.95);
+  color: var(--neon-green);
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 100;
+}
+.resize-btn:hover .resize-btn-tooltip {
+  opacity: 1;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .projects-grid { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .roleta-modal-box { width: 95vw; height: 80vh; }
+}

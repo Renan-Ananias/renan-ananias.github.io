@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 16" width="22" height="16">
+  <rect width="22" height="16" fill="#FFF"/>
+  <rect y="0" width="22" height="1.23" fill="#B22234"/>
+  <rect y="2.46" width="22" height="1.23" fill="#B22234"/>
+  <rect y="4.92" width="22" height="1.23" fill="#B22234"/>
+  <rect y="7.38" width="22" height="1.23" fill="#B22234"/>
+  <rect y="9.84" width="22" height="1.23" fill="#B22234"/>
+  <rect y="12.3" width="22" height="1.23" fill="#B22234"/>
+  <rect y="14.76" width="22" height="1.23" fill="#B22234"/>
+  <rect width="9.5" height="8.6" fill="#3C3B6E"/>
+  <!-- 13 stars simplified -->
+  <circle cx="2" cy="1.5" r="0.55" fill="#FFF"/>
+  <circle cx="4.5" cy="1.5" r="0.55" fill="#FFF"/>
+  <circle cx="7" cy="1.5" r="0.55" fill="#FFF"/>
+  <circle cx="3.2" cy="3.5" r="0.55" fill="#FFF"/>
+  <circle cx="5.7" cy="3.5" r="0.55" fill="#FFF"/>
+  <circle cx="8.2" cy="3.5" r="0.55" fill="#FFF"/>
+  <circle cx="2" cy="5.5" r="0.55" fill="#FFF"/>
+  <circle cx="4.5" cy="5.5" r="0.55" fill="#FFF"/>
+  <circle cx="7" cy="5.5" r="0.55" fill="#FFF"/>
+  <circle cx="3.2" cy="7.5" r="0.55" fill="#FFF"/>
+  <circle cx="5.7" cy="7.5" r="0.55" fill="#FFF"/>
+</svg>
